@@ -12,4 +12,4 @@ Input, output and attenuation levels are indicated on IN-2 Nixie tubes, driven b
 
 Interface to the main unit is via RS485 using the interface board found here:  https://arduino-info.wikispaces.com/RS485-Modules
 
-I am relatively new to programming, so this code may be wildly inefficient...but it works.
+I am new to Arduino programming, so this code may be wildly inefficient...but it works.
