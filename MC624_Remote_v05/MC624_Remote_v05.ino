@@ -9,14 +9,15 @@
 // MC624 serial command reference:
 // CMD_VOL = B00000000;    // VOL:b5...b0
 // CMD_INOUT = B01000000;  // SUB:b5  OUT:b4-b3(0..3)  IN:b2-b1-b0(0..5)
-// CMD_FN = B10000000;     // MUTEL:b5  MUTER:b4  DIM:b0
+// CMD_FN = B10000000;     // MUTEL:b5  MUTER:b4  INVR:b3  MONO:b2  DIM:b0
 
-// Arduinix 4 tube board by Jeremy Howa mods by M. Keith Moore for IN-2/IN-12 4 digit and blinking colon
+// Code for Arduinix 4 tube board by Jeremy Howa mods by M. Keith Moore 
+// for IN-2/IN-12 4 digits and blinking colon
 // www.robotpirate.com
 // www.arduinix.com
 // 2009/2016(MKM)
 //
-// Note: Anod pin 3 and 2 are used for colons
+// Note: Anod pin 3 and 2 are used for colons (not used in this design).
 // 
 // Anod to number diagram for IN-2/IN-12 boards:
 //          num array position
@@ -203,7 +204,7 @@ void setup()
     delay(60);
     digitalWrite(marquee, LOW);
   }
-  for (int marquee = muteL_LED; marquee >=in1_LED; marquee--)   // Right to left
+  for (int marquee = muteR_LED; marquee >=in1_LED; marquee--)   // Right to left
   {
     digitalWrite(marquee, HIGH);
     delay(60);
