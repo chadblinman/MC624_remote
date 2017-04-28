@@ -566,10 +566,17 @@ void loop()
   int volumeTens = ((displayVolume/10)%10);
   // Fill in the Number array for the Nixie tubes:
   int NumberArray[4];
-  NumberArray[0] = (inSelect + 1);
-  NumberArray[1] = (spkSelect + 1);
-  NumberArray[2] = volumeTens;
-  NumberArray[3] = volumeOnes;
+  NumberArray[0] = (inSelect + 1);         // Selected input
+  NumberArray[1] = volumeTens;             // Current volume - tens digit
+  NumberArray[2] = volumeOnes;             // Current volume - ones digit
+  if (muteL == 1 && muteR == 1)            // If MUTE L and R are on...
+  {
+    NumberArray[3] = 0;                    // ...speaker 0...
+  }
+  else
+  {
+    NumberArray[3] = (spkSelect + 1);      // ...otherwise selected speaker
+  }
   // Display on the Nixie tubes:
   DisplayNumberString( NumberArray );
 
