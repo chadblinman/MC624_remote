@@ -1,7 +1,7 @@
 # MC624_remote
 An Arduino-based desktop hardware remote for the SoundSkulptor MC624 monitor controller (http://www.soundskulptor.com/uk/mc624.html).
 
-The remote is built on an Arduino Mega2560 –– overqualified in terms of memory and processing but chosen for its many I/O pins, so I could develop the code simply without complex multiplexing.
+The remote is built on an Arduino Mega2560 –– overqualified in terms of memory and processing but chosen for its many I/O pins, so I could develop simply without multiplexing for the 15 illuminated buttons.
 
 Input, output and attenuation levels are indicated on IN-2 Nixie tubes, driven by an Arduinix shield:  https://www.tindie.com/products/Nixiekeith/arduinix-nixie-driver-shield/  (see also http://www.arduinix.com/)
 
@@ -14,4 +14,4 @@ Volume is controlled by a 10K linear taper analog potentiometer (I used this Bou
 
 A single cable connects to the remote control unit, splitting at the opposite end to connect to a power supply (+9 - +12VDC to the Arduino) and to the main unit's LINK I/O using a standard USB connector.  The main unit is switched to slave mode to respond to commands via the LINK input.
 
-The code essentially does two things:  It continuously indicates its own local status, and it transmits serial commands to the main unit whenever the user changes a setting. The connection is unidirectional, so the remote's status is not updated by status of the main unit.  (When the user operates the main unit's front panel, it works normally but the remote will not indicate any change.  The next command from the remote will then override.)  As long as operation happens at the remote, its local status will always be in parity with the main unit.  Since the main unit's input and output selections persist on power-down, the remote also updates its input/output status to EEPROM whenever it is changed by the user –– so on power-up the remote and the main unit will be in parity.
+The code essentially does two things:  It continuously indicates its own local status, and it transmits serial commands to the main unit whenever the user changes a setting. The serial connection is unidirectional, so the remote's status is not updated by status of the main unit.  (When the user operates the main unit's front panel, it works normally but the remote will not indicate any change.  The next command from the remote will then override.)  As long as operation happens at the remote, its local status will always be in parity with the main unit.  Since the main unit's input and output selections persist on power-down, the remote also updates its input/output status to EEPROM whenever it is changed by the user –– so on power-up the remote and the main unit will be in parity.
