@@ -22,8 +22,8 @@
 // CMD_VOL = B00000000;    // VOL:b5...b0
 // CMD_INOUT = B01000000;  // SUB:b5  OUT:b4-b3(0..3)  IN:b2-b1-b0(0..5)
 // CMD_FN = B10000000;     // MUTEL:b5  MUTER:b4  INVR:b3  MONO:b2  DIM:b0
-//
-// SN74141 Truth Table:
+///////////////////////////////////////////////////////////////////////////////
+// SN74141 truth table reference:
 // D C B A #
 // L,L,L,L 0
 // L,L,L,H 1
@@ -48,8 +48,8 @@ int cathodePin_1_b = 7;
 int cathodePin_1_c = 8;
 int cathodePin_1_d = 9;
 // anode pins:
-int anodePin_1 = 10;  // marked anode #3 on arduinix board
-int anodePin_2 = 11;  // marked anode #4 on arduinix board
+int anodePin_1 = 10;  // marked anode #3 on Arduinix header
+int anodePin_2 = 11;  // marked anode #4 on Arduinix header
 
 // button and LED pins:
 int in1_button = 22; int in1_LED = 37; 
@@ -106,18 +106,14 @@ boolean spk4_button_status = 0;
 int volume = 0;                     // the volume level to send to MC624
 int displayVolume = 0;              // attenuation formatted for Nixie display
 
-// pin definition for ResponsiveAnalogRead (volume pot)
-const int ANALOG_PIN = A0;
-
 // make a ResponsiveAnalogRead object, pass in the pin, and either true or false depending on if you want sleep enabled
 // enabling sleep will cause values to take less time to stop changing and potentially stop changing more abruptly,
 // whereas disabling sleep will cause values to ease into their correct position smoothly and more accurately
-ResponsiveAnalogRead analog(ANALOG_PIN, true);
-
 // the next optional argument is snapMultiplier, which is set to 0.01 by default
 // you can pass it a value from 0 to 1 that controls the amount of easing
 // increase this to lessen the amount of easing (such as 0.1) and make the responsive values more responsive
 // but doing so may cause more noise to seep through if sleep is not enabled
+ResponsiveAnalogRead analog(A0, true, 0.1);
 
 // RS485 serial interface pins:
 int SSerialRX = 19;          // Serial Receive pin (Receive Out) - not connected but must be declared
@@ -135,7 +131,7 @@ void SetSN74141Chips(int num2, int num1)
   boolean c=0;
   boolean d=0;
   
-  // Load a,b,c,d to write to SN74141 (1):
+  // load a,b,c,d to write to SN74141 (1):
   switch (num1)
   {
     case 0: a=0; b=0; c=0; d=0; break;
@@ -152,13 +148,13 @@ void SetSN74141Chips(int num2, int num1)
     break;
   }  
   
-  // Write to output pins:
+  // write to output pins:
   digitalWrite(cathodePin_0_a, a);
   digitalWrite(cathodePin_0_b, b);
   digitalWrite(cathodePin_0_c, c);
   digitalWrite(cathodePin_0_d, d);
 
-  // Load a,b,c,d to write to SN74141 (2):
+  // load a,b,c,d to write to SN74141 (2):
   switch (num2)
   {
     case 0: a=0; b=0; c=0; d=0; break;
@@ -175,7 +171,7 @@ void SetSN74141Chips(int num2, int num1)
     break;
   }
   
-  // Write to output pins:
+  // write to output pins:
   digitalWrite(cathodePin_1_a, a);
   digitalWrite(cathodePin_1_b, b);
   digitalWrite(cathodePin_1_c, c);
@@ -184,7 +180,7 @@ void SetSN74141Chips(int num2, int num1)
 ///////////////////////////////////////////////////////////////////////
 
 float fadeMax = 8.0f;
-float fadeStep = 0.9f;           // Adjust for fade effect.  Smaller number = slower fade.
+float fadeStep = 0.9f;              // adjust for fade effect (smaller number = slower fade)
 int NumberArray[4] = {0, 0, 0, 0};
 int currNumberArray[4] = {0, 0, 0, 0};
 float NumberArrayFadeInValue[2] = {0.0f, 0.0f};
@@ -282,7 +278,7 @@ void setup()
   pinMode(anodePin_1, OUTPUT);
   pinMode(anodePin_2, OUTPUT);
 
-  // Button pin configuration:
+  // button pin configuration:
   pinMode(in1_button, INPUT_PULLUP);
   pinMode(in2_button, INPUT_PULLUP);
   pinMode(in3_button, INPUT_PULLUP);
@@ -320,20 +316,20 @@ void setup()
   pinMode(SSerialTxControl, OUTPUT);
   digitalWrite(SSerialTxControl, HIGH);
 
-  // Start the RS485 software serial port:
+  // start the RS485 software serial port:
   RS485Serial.begin(9600);
 
-  // Start the USB serial monitor port (uncomment if needed):
+  // start the USB serial monitor port:
 //  Serial.begin(9600);
   
-  // Run Nixie startup cycle:
+  // run Nixie startup cycle:
   int digit[4] = {0,2,3,1};
   for (int number = 0; number <= 9; number++)
   {
     for (int i = 0; i < 4; i++)
     {
       int rep = 0;
-      while(rep < 8)
+      while(rep < 7)
       {
         NumberArray[digit[i]] = number;
         DisplayFadeNumberString();
@@ -342,21 +338,21 @@ void setup()
     }
   }  
 
-  // Run button LED startup effect:
+  // run LED startup effect:
   int marquee_button[15] = {in1_LED, in2_LED, in3_LED, in4_LED, in5_LED, in6_LED, dim_LED, mono_LED, invR_LED, muteL_LED, muteR_LED, spk4_LED, spk3_LED, spk2_LED, spk1_LED}; 
   for (int blinky = 0; blinky <= 14; blinky++)   // left to right
     {
     digitalWrite(marquee_button[blinky], HIGH);
-    delay(70);
+    delay(60);
     digitalWrite(marquee_button[blinky], LOW);      
     }
   for (int blinky = 13; blinky >= 0; blinky--)   // and back
   {
     digitalWrite(marquee_button[blinky], HIGH);
-    delay(70);
+    delay(60);
     digitalWrite(marquee_button[blinky], LOW);
   }
-  for (int blinky = 0; blinky <= 14; blinky++)   // flash all at once
+  for (int blinky = 0; blinky <= 14; blinky++)   // then flash all at once
     {
     digitalWrite(marquee_button[blinky], HIGH);
     }
@@ -377,27 +373,27 @@ void setup()
     }      
   delay(100);
   
-  // Set Input and Speaker LEDs according to stored InOut value:
+  // set Input and Speaker LEDs according to stored InOut value:
   digitalWrite((in1_LED + inSelect), HIGH);
   digitalWrite((spk1_LED - spkSelect), HIGH);
-//  Serial.print("stored input: ");      // Print to serial monitor
-//  Serial.println(inSelect + 1);        // Print to serial monitor
-//  Serial.print("stored speaker: ");    // Print to serial monitor
-//  Serial.println(spkSelect + 1);       // Print to serial monitor
+//  Serial.print("stored input: ");      // print to serial monitor
+//  Serial.println(inSelect + 1);
+//  Serial.print("stored speaker: ");
+//  Serial.println(spkSelect + 1);
 
-  // Set initial monitor functions and indicate (muteL and muteR):
+  // set initial monitor functions and indicate (muteL and muteR):
   RS485Serial.write(functions);
   digitalWrite(muteL_LED, muteL);  
   digitalWrite(muteR_LED, muteR);  
-//  Serial.print("functions: ");           // Print to serial monitor
-//  Serial.println(functions, BIN);        // Print to serial monitor 
+//  Serial.print("functions: ");           // print to serial monitor
+//  Serial.println(functions, BIN);
 
 }
 
 void loop()     
 {
  
-  // Input select:
+  // input (source) select:
   if (digitalRead(in1_button) == LOW && in1_button_status == 0)  // input 1 button is pressed
   {
     inSelect = 0;                      // set input 1
@@ -458,7 +454,7 @@ void loop()
     in6_button_status = 0;             // reset status
   }
 
-  // Speaker select:
+  // speaker select:
   if (digitalRead(spk1_button) == LOW && spk1_button_status == 0)  // speaker 1 button is pressed
   {
     spkSelect = 0;                      // set speaker 1
@@ -499,34 +495,34 @@ void loop()
     spk4_button_status = 0;             // reset status
   }
 
-  // Calculate InOut value:
+  // calculate InOut value:
   InOut = B01000000 + inSelect + (spkSelect << 3);
 
-  // If input or output are changed, send to RS485 and update:
+  // if input or output selection is changed, send to RS485 and update:
   if (InOut != previousInOut)
   {
-    RS485Serial.write(InOut);                    // Send to RS485
-//    Serial.print("input select: ");              // Print to serial monitor
-//    Serial.println(inSelect + 1);                // Print to serial monitor
-//    Serial.print("speaker select: ");            // Print to serial monitor
-//    Serial.println(spkSelect + 1);               // Print to serial monitor
-    if (inSelect != previousInSelect)                     // If the input select is different:
+    RS485Serial.write(InOut);                    // write to RS485
+//    Serial.print("input select: ");
+//    Serial.println(inSelect + 1);
+//    Serial.print("speaker select: ");
+//    Serial.println(spkSelect + 1); 
+    if (inSelect != previousInSelect)                     // if the input select is different:
     {
-      digitalWrite((in1_LED + inSelect), HIGH);           // Turn on new input LED
-      digitalWrite((in1_LED + previousInSelect), LOW);    // Turn off previous input LED
-      previousInSelect = inSelect;                        // Update
+      digitalWrite((in1_LED + inSelect), HIGH);           // turn on new input LED
+      digitalWrite((in1_LED + previousInSelect), LOW);    // turn off previous input LED
+      previousInSelect = inSelect;                        // update previous
     }
-    if (spkSelect != previousSpkSelect)                   // If the speaker select is different:
+    if (spkSelect != previousSpkSelect)                   // if the speaker select is different:
     {
-      digitalWrite((spk1_LED - spkSelect), HIGH);         // Turn on new speaker LED
-      digitalWrite((spk1_LED - previousSpkSelect), LOW);  // Turn off previous speaker LED
-      previousSpkSelect = spkSelect;                      // Update      
+      digitalWrite((spk1_LED - spkSelect), HIGH);         // turn on new speaker LED
+      digitalWrite((spk1_LED - previousSpkSelect), LOW);  // turn off previous speaker LED
+      previousSpkSelect = spkSelect;                      // update previous
     }   
-    previousInOut = InOut;                  // Update previous value
-    EEPROM.update(InOutAddress, InOut);     // Update value to EEPROM
+    previousInOut = InOut;                  // update previous value
+    EEPROM.update(InOutAddress, InOut);     // update value to EEPROM
   }
 
-  // Mute and other functions:
+  // mutes and other functions:
   if (digitalRead(muteL_button) == LOW && muteL_button_status == 0)   // mute L button is pressed
   {
     muteL = !muteL;                      // toggle mute L
@@ -577,21 +573,21 @@ void loop()
     dim_button_status = 0;                // reset status
   }
   
-  // Calculate functions value:
+  // calculate functions value:
   functions = B10000000 + (muteL << 5) + (muteR << 4) + (mono << 3) + (invR << 2) + dim;
 
-  // If functions have changed, send command to RS485 and toggle LEDs:
+  // if functions have changed, send to RS485 and toggle LEDs:
   if (functions != previousFunctions)
   { 
     RS485Serial.write(functions);
-//    Serial.print("functions: ");           // Print to serial monitor
-//    Serial.println(functions, BIN);        // Print to serial monitor 
-    digitalWrite(muteL_LED, muteL);        // Toggle LEDs
+//    Serial.print("functions: ");           // print to serial monitor
+//    Serial.println(functions, BIN);        // print to serial monitor 
+    digitalWrite(muteL_LED, muteL);        // toggle LEDs
     digitalWrite(muteR_LED, muteR);
     digitalWrite(mono_LED, mono);
     digitalWrite(invR_LED, invR);
     digitalWrite(dim_LED, dim);
-    previousFunctions = functions;         // Update
+    previousFunctions = functions;         // update
   }
 
   // set NumberArray for input and speaker
@@ -607,26 +603,19 @@ void loop()
 
   // volume read - update the ResponsiveAnalogRead object every loop
   analog.update();
-  volume = analog.getValue() / 16;         // Divide by 16 to scale to 0-63 for MC624
-//  delay(20);
    
-  // format analog value for Nixie display:
-  displayVolume = map(analog.getValue(), 0, 1023, 63, 0);       // scale according to MC624 volume display setting
-  if (dim == 1)
-  {
-    displayVolume = displayVolume + 15;                         // set according to MC624 dim setting
-  }
-  // separate into digits:
-  int volumeOnes = (displayVolume%10);
-  int volumeTens = ((displayVolume/10)%10);
-
   // if the volume level has changed, write to RS485 serial and update NumberArray:
   if(analog.hasChanged()) 
   {
-    RS485Serial.write(volume);
-    NumberArray[2] = volumeTens;           // set NumberArray for volume - tens digit
-    NumberArray[3] = volumeOnes;           // set NumberArray for volume - ones digit
+    volume = analog.getValue() / 16;                       // get responsive value and divide by 16 to scale to 0-63
+    RS485Serial.write(volume);                             // write to RS485
+    displayVolume = map(volume, 0, 63, 63, 0);             // reverse scale according to MC624 volume display
+    if (dim == 1) {displayVolume = displayVolume + 15;}    // when dimmed, adjust according to MC624 dim setting
+    int volumeTens = ((displayVolume/10)%10);              // separate into digits - tens
+    int volumeOnes = (displayVolume%10);                   // separate into digits - ones
+    NumberArray[2] = volumeTens;                           // set NumberArray for volume - tens digit
+    NumberArray[3] = volumeOnes;                           // set NumberArray for volume - ones digit
   }
 
-  DisplayFadeNumberString();               // Display on Nixies
+  DisplayFadeNumberString();               // display full NumberArray on Nixies
 }
